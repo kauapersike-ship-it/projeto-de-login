@@ -110,16 +110,27 @@ async function irParaPlanos() {
 
 // Registrar
 async function fazerRegistro(email, usuario, senha) {
-    const { data, error } = await supabaseClient
-        .from('usuarios')
-        .insert([{ email, username: usuario, senha }]);
+    try {
+        const { data, error } = await supabaseClient
+            .from('usuarios')
+            .insert([{ email, username: usuario, senha }]);
 
-    if (error) {
-        alert('Erro ao registrar: ' + error.message);
-        return;
+        if (error) {
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes('duplicate') || msg.includes('usuarios_email_key') || msg.includes('duplicate key')) {
+                alert('Erro: esse email já está cadastrado. Faça login ou recupere sua senha.');
+                return;
+            }
+
+            alert('Erro ao registrar: ' + error.message);
+            return;
+        }
+
+        alert('Cadastro realizado!');
+    } catch (err) {
+        console.error('Erro ao registrar:', err);
+        alert('Erro inesperado: ' + (err.message || err));
     }
-
-    alert('Cadastro realizado!');
 }
 
 // Finalizar cadastro com plano
@@ -143,8 +154,14 @@ async function finalizarCadastroComPlano(plano) {
             }]);
 
         if (error) {
-            // Se o erro indicar que a coluna 'plano' não existe, tenta inserir sem o campo
+            // Tratar email duplicado primeiro
             const msg = (error.message || '').toLowerCase();
+            if (msg.includes('duplicate') || msg.includes('usuarios_email_key') || msg.includes('duplicate key')) {
+                alert('Erro: esse email já está cadastrado. Faça login ou recupere sua senha.');
+                return;
+            }
+
+            // Se o erro indicar que a coluna 'plano' não existe, tenta inserir sem o campo
             if (msg.includes("could not find the 'plano' column") || msg.includes("column \"plano\"") || msg.includes("column 'plano'")) {
                 console.warn("Coluna 'plano' não encontrada — tentando inserir sem 'plano'.");
                 const { data: data2, error: error2 } = await supabaseClient
@@ -156,6 +173,13 @@ async function finalizarCadastroComPlano(plano) {
                     }]);
 
                 if (error2) {
+                    // Verificar duplicidade também no segundo intento
+                    const m2 = (error2.message || '').toLowerCase();
+                    if (m2.includes('duplicate') || m2.includes('usuarios_email_key') || m2.includes('duplicate key')) {
+                        alert('Erro: esse email já está cadastrado. Faça login ou recupere sua senha.');
+                        return;
+                    }
+
                     alert('Erro ao registrar: ' + error2.message);
                     return;
                 }
