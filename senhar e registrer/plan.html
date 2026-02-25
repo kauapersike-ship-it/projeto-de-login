@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolher Plano</title>
+    <link rel="stylesheet" href="planstyle.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <button class="voltar" onclick="history.back()">← Voltar</button>
+
+    <div class="container-plan">
+        <h1>Escolha seu Plano</h1>
+        
+        <div class="plans">
+            <div class="plan-card">
+                <h2>Gratuito</h2>
+                <div class="price">R$ 0<span class="period">/mês</span></div>
+                <ul class="features">
+                    <li>Acesso básico</li>
+                    <li>1 projeto</li>
+                    <li>1 GB de armazenamento</li>
+                    <li>Email de suporte</li>
+                </ul>
+                <button class="btn-plano" onclick="escolherPlano('gratuito')">Escolher</button>
+            </div>
+
+            <div class="plan-card popular">
+                <h2>⭐ Pro</h2>
+                <div class="price">R$ 29<span class="period">/mês</span></div>
+                <ul class="features">
+                    <li>Acesso completo</li>
+                    <li>Projetos ilimitados</li>
+                    <li>100 GB de armazenamento</li>
+                    <li>Suporte prioritário</li>
+                    <li>Analytics avançado</li>
+                </ul>
+                <button class="btn-plano" onclick="escolherPlano('pro')">Escolher</button>
+            </div>
+
+            <div class="plan-card">
+                <h2>Premium</h2>
+                <div class="price">R$ 99<span class="period">/mês</span></div>
+                <ul class="features">
+                    <li>Tudo do Pro +</li>
+                    <li>Armazenamento ilimitado</li>
+                    <li>API customizada</li>
+                    <li>Suporte 24/7 prioritário</li>
+                    <li>Webhook avançado</li>
+                </ul>
+                <button class="btn-plano" onclick="escolherPlano('premium')">Escolher</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+    <script src="./plan.js"></script>
+</body>
+</html>

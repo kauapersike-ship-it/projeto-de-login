@@ -1,0 +1,184 @@
+const SUPABASE_URL = 'https://djwclyuyctftavgdmdyp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_DUl78ptuo5EBHfOL6pdWKA_fLvdZf37';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function testarConexao() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('usuarios')
+            .select('*')
+            .limit(1);
+
+        if (error) {
+            alert(`Erro na conexão: ${error.message}`);
+            return;
+        }
+
+        alert(`✅ Banco conectado!\nTotal de usuários: ${data.length}`);
+    } catch (err) {
+        alert(`Erro: ${err.message}`);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btnLogin = document.getElementById('btnLogin');
+    if (btnLogin) {
+        btnLogin.addEventListener('click', fazerLogin);
+    }
+
+    const btnTestConnection = document.getElementById('btnTestConnection');
+    if (btnTestConnection) {
+        btnTestConnection.addEventListener('click', testarConexao);
+    }
+
+    const btnProximo = document.getElementById('btnProximo');
+    if (btnProximo) {
+        btnProximo.addEventListener('click', irParaPlanos);
+    }
+});
+
+async function fazerLogin() {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    
+    if (!email || !senha) {
+        alert('Por favor, preencha email e senha');
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from('usuarios')
+        .select('*')
+        .eq('email', email)
+        .eq('senha', senha);
+
+    if (error || data.length === 0) {
+        alert('Usuário ou senha incorretos');
+        return;
+    }
+
+    alert('Login realizado com sucesso!');
+    document.getElementById('email').value = '';
+    document.getElementById('senha').value = '';
+}
+
+// Registrar
+async function irParaPlanos() {
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email-reg').value;
+    const senha = document.getElementById('senha-reg').value;
+    const confirmarSenha = document.getElementById('confirmar-senha').value;
+
+    if (!username || !email || !senha || !confirmarSenha) {
+        alert('Por favor, preencha todos os campos');
+        return;
+    }
+
+    if (senha !== confirmarSenha) {
+        alert('As senhas não correspondem');
+        return;
+    }
+
+    if (senha.length < 6) {
+        alert('A senha deve ter no mínimo 6 caracteres');
+        return;
+    }
+
+    const registroData = {
+        username: username,
+        email: email,
+        senha: senha
+    };
+    sessionStorage.setItem('registroData', JSON.stringify(registroData));
+    
+    alert('Dados validados! Escolha seu plano.');
+    window.location.href = './plan.html';
+}
+
+async function fazerRegistro(email, usuario, senha) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('usuarios')
+            .insert([{ email, username: usuario, senha }]);
+
+        if (error) {
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes('duplicate') || msg.includes('usuarios_email_key') || msg.includes('duplicate key')) {
+                alert('Erro: esse email já está cadastrado. Faça login ou recupere sua senha.');
+                return;
+            }
+
+            alert('Erro ao registrar: ' + error.message);
+            return;
+        }
+
+        alert('Cadastro realizado!');
+    } catch (err) {
+        console.error('Erro ao registrar:', err);
+        alert('Erro inesperado: ' + (err.message || err));
+    }
+}
+
+async function finalizarCadastroComPlano(plano) {
+    const registroData = JSON.parse(sessionStorage.getItem('registroData'));
+    
+    if (!registroData) {
+        alert('Erro: dados do registro não encontrados');
+        return;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('usuarios')
+            .insert([{ 
+                email: registroData.email, 
+                username: registroData.username, 
+                senha: registroData.senha,
+                plano: plano
+            }]);
+
+        if (error) {
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes('duplicate') || msg.includes('usuarios_email_key') || msg.includes('duplicate key')) {
+                alert('Erro: esse email já está cadastrado. Faça login ou recupere sua senha.');
+                return;
+            }
+
+            if (msg.includes("could not find the 'plano' column") || msg.includes("column \"plano\"") || msg.includes("column 'plano'")) {
+                const { data: data2, error: error2 } = await supabaseClient
+                    .from('usuarios')
+                    .insert([{ 
+                        email: registroData.email, 
+                        username: registroData.username, 
+                        senha: registroData.senha
+                    }]);
+
+                if (error2) {
+                    const m2 = (error2.message || '').toLowerCase();
+                    if (m2.includes('duplicate') || m2.includes('usuarios_email_key') || m2.includes('duplicate key')) {
+                        alert('Erro: esse email já está cadastrado. Faça login ou recupere sua senha.');
+                        return;
+                    }
+
+                    alert('Erro ao registrar: ' + error2.message);
+                    return;
+                }
+
+                alert(`Cadastro realizado com sucesso!\n(Plano não salvo — coluna ausente)`);
+                sessionStorage.removeItem('registroData');
+                window.location.href = './login.html';
+                return;
+            }
+
+            alert('Erro ao registrar: ' + error.message);
+            return;
+        }
+
+        alert(`Cadastro realizado com sucesso!\nPlano: ${plano.toUpperCase()}`);
+        sessionStorage.removeItem('registroData');
+        window.location.href = './login.html';
+    } catch (err) {
+        console.error('Erro ao finalizar cadastro:', err);
+        alert('Erro inesperado: ' + (err.message || err));
+    }
+}
