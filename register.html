@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'> 
+    <link rel="stylesheet" href="stylelogin.css">
+    <title>Cadastro</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <main class="container">    
+        <form id="registerForm">
+            <h1>Cadastro</h1>
+
+            <div class="input-box">
+                <input id="username" placeholder="nome de usuário" type="text">
+                <i class="bx bxs-user"></i>
+            </div>
+
+            <div class="input-box">
+                <input id="email-reg" placeholder="email" type="email">
+                <i class="bx bxs-envelope"></i>
+            </div>
+
+            <div class="input-box">
+                <input id="senha-reg" placeholder="senha" type="password">
+                <i class="bx bxs-lock-alt"></i>
+            </div>
+
+            <div class="input-box">
+                <input id="confirmar-senha" placeholder="confirmar senha" type="password">
+                <i class="bx bxs-lock-alt"></i>
+            </div>
+
+            <button id="btnProximo" type="button">Próximo - Escolher Plano</button>
+
+            <div class="register-link">
+                <p>Já tem uma conta? <a href="./login.html">Faça login</a></p>
+            </div>
+        </form>
+    </main>
+
+    <script src="./script.js"></script>
+</body>
+</html>
