@@ -2,34 +2,12 @@ const SUPABASE_URL = 'https://djwclyuyctftavgdmdyp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_DUl78ptuo5EBHfOL6pdWKA_fLvdZf37';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function testarConexao() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('usuarios')
-            .select('*')
-            .limit(1);
-
-        if (error) {
-            alert(`Erro na conexão: ${error.message}`);
-            return;
-        }
-
-        alert(`✅ Banco conectado!\nTotal de usuários: ${data.length}`);
-    } catch (err) {
-        alert(`Erro: ${err.message}`);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     const btnLogin = document.getElementById('btnLogin');
     if (btnLogin) {
         btnLogin.addEventListener('click', fazerLogin);
     }
 
-    const btnTestConnection = document.getElementById('btnTestConnection');
-    if (btnTestConnection) {
-        btnTestConnection.addEventListener('click', testarConexao);
-    }
 
     const btnProximo = document.getElementById('btnProximo');
     if (btnProximo) {
